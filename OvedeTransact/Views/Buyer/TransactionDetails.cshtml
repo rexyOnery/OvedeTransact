@@ -1,0 +1,239 @@
+﻿
+@{
+    ViewData["Title"] = "TransactionDetails";
+    Layout = "~/Views/Shared/_BuyerLayout.cshtml";
+}
+ 
+<style>
+    .hidden {
+        display: none;
+    }
+
+    .sly-success {
+        color: #00B050;
+    }
+
+    .sly-warning {
+        color: #FFC000;
+    }
+
+    .sly-danger {
+        color: #FF0000
+    }
+</style>
+
+<div class="section mt-2 mb-2">
+
+
+    <div class="listed-detail mt-3">
+        <div class="icon-wrapper">
+            <div class="iconbox">
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+        </div>
+        <h3 class="text-center mt-2">Transaction Details</h3>
+    </div>
+
+    <ul class="listview flush transparent simple-listview no-space mt-3">
+        <li>
+            <h3 class="m-0" id="transaction-details"></h3>
+        </li>
+        <li>
+            <strong>Date</strong>
+            <span id="transaction-date"></span>
+        </li>
+        <li>
+            <strong>Buyer's Phone Number</strong>
+            <span id="transaction-phone"></span>
+        </li>
+        <li>
+            <strong>Seller's Phone Number</strong>
+            <span id="seller-phone"></span>
+        </li>
+        <li id="transcodec">
+            <strong>Transaction Number</strong>
+            <h3 class="m-0" id="transaction-code"></h3>
+        </li>
+        <li id="deliveryid">
+            <strong>Delivery Number</strong>
+            <span id="delivery-code"></span>
+        </li>
+        <li>
+            <strong>Cost of the Good/Item</strong>
+            <span id="transaction-agreed"></span>
+        </li>
+        <li>
+            <strong>Shipping/Delivery/Transportation</strong>
+            <span id="transaction-ship"></span>
+        </li>
+        <li>
+            <strong>Brigho Commission</strong>
+            <span id="transaction-commission"></span>
+        </li>
+        <li>
+            <strong>Total Cost</strong>
+            <h3 class="m-0" id="total-cost"></h3>
+        </li>
+    </ul>
+    <input type="hidden" id="trans-id" />
+
+</div>
+<div class="section mt-2" id="followup">
+    <div class="section-title"></div>
+    <div class="card">
+        <div class="card-body">
+            <a href="javascript: followmeup();" id="btnFollow" class="btn btn-primary btn-block shadowed">Verify Transaction</a>
+
+            <button class="btn btn-primary btn-block shadowed hidden" type="button" disabled id="btnProgress">
+                <span class="spinner-border spinner-border-sm mr-05" role="status" aria-hidden="true"></span>
+                Processing...
+            </button>
+        </div>
+
+        <div class="card-body">
+            <a href="javascript:doDecline()" id="btnDecline" class="btn btn-danger btn-block shadowed">DECLINE</a>
+        </div>
+    </div>
+</div>
+<div class="section mb-5 p-2 hidden" id="delivery">
+    <form>
+        <div class="form-button-group transparent">
+            <a href="javascript: delivercode();" id="btnCodify" class="btn btn-primary btn-block shadowed">Verify Transaction</a>
+
+            <button class="btn btn-primary btn-block shadowed hidden" type="button" disabled id="btnCodifyProgress">
+                <span class="spinner-border spinner-border-sm mr-05" role="status" aria-hidden="true"></span>
+                Processing...
+            </button>
+        </div>
+
+    </form>
+</div>
+<div class="section full mt-5 hidden" id="span_stats">
+    <div class="wide-block pt-2 pb-2">
+        <div class="content-header mb-05"><h4>Transaction Status</h4></div>
+        <h3><span id="span_transact_status"></span></h3>
+        <div class="content-footer mt-05"></div>
+    </div>
+</div>
+<!-- DialogIconedDanger -->
+<div class="modal fade dialogbox" id="DialogIconedDanger" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-icon text-danger">
+                <ion-icon name="close-circle"></ion-icon>
+            </div>
+            <div class="modal-header">
+                <h5 class="modal-title">Error</h5>
+            </div>
+            <div class="modal-body">
+                There is something wrong. please try again.
+            </div>
+            <div class="modal-footer">
+                <div class="btn-inline">
+                    <a href="#" class="btn" data-dismiss="modal">CLOSE</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- * DialogIconedDanger -->
+<input type="hidden" id="trans-number" />
+<input type="hidden" id="delivcode" />
+<script>
+
+    var uri = "http://medicall-002-site7.ctempurl.com/api/ahhtapi";
+    //var uri = "http://localhost:49244/api/ahhtapi";
+
+    function followmeup() {
+        $("#btnFollow").addClass('hidden');
+        $("#btnProgress").removeClass('hidden');
+        $("#btnDecline").removeClass('hidden');
+        location.href = "/buyer/followup?trans=" + document.getElementById('trans-number').value;
+    }
+
+    function delivercode() {
+        $("#btnCodify").addClass('hidden');
+        $("#btnCodifyProgress").removeClass('hidden');
+        location.href = "/buyer/verify?id=" + document.getElementById('trans-id').value + "&" + document.getElementById('delivcode').value;
+    }
+    display();
+    function display() {
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
+
+        var _query = location.search.split('=');
+        document.getElementById('trans-id').value = _query[1];
+
+        fetch(uri + "/buyertransactiondetails?id=" + _query[1], requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    $("#DialogIconedDanger").modal('show');
+                }
+                console.log(response);
+                return response.json();
+            })
+            .then(result => fetchData(result))
+            .catch(error => $("#DialogIconedDanger").modal('show'));
+    }
+
+    function fetchData(data) {
+        console.log(data);
+        if (data) {
+            data.forEach(item => {
+                document.getElementById('total-cost').innerHTML = '&#8358;' + formatMoney(parseFloat(item.totalCost));
+                document.getElementById('transaction-code').innerHTML = item.transactionCode;
+                document.getElementById('trans-number').value = item.transactionCode;
+                if (item.confirmationCode == "none") {
+                    document.getElementById('deliveryid').remove();
+                } else {
+                    document.getElementById('delivery-code').innerHTML = item.confirmationCode;
+                    document.getElementById('delivcode').value = item.confirmationCode;
+                    $("#delivery").removeClass('hidden');
+                    document.getElementById('btnDecline').remove();
+                    document.getElementById('followup').remove();
+                    document.getElementById('transcodec').remove();
+
+                }
+                if (item.transactionStatus == "danger") {
+                    $("#followup").addClass('hidden');
+                    $("#delivery").addClass('hidden');
+                    $("#span_stats").removeClass('hidden');
+                    $("#span_transact_status").html(item.reasons);
+                    $("#span_transact_status").addClass('sly-danger');
+                } else {
+                    if (item.transactionStatus == "success") {
+                        $("#followup").addClass('hidden');
+                        $("#delivery").addClass('hidden');
+                        $("#span_stats").removeClass('hidden');
+                        $("#span_transact_status").html(item.reasons);
+                        $("#span_transact_status").addClass('sly-success');
+                    }
+                }
+                document.getElementById('transaction-details').innerHTML = item.transactionDescription;
+                document.getElementById('transaction-date').innerHTML = item.transactionDate;
+                document.getElementById('transaction-phone').innerHTML = item.buyerMobileNumber;
+                document.getElementById('seller-phone').innerHTML = item.sellerMobileNumber;
+                document.getElementById('transaction-ship').innerHTML = '&#8358;' + formatMoney(parseFloat(item.shippingCost));
+                document.getElementById('transaction-commission').innerHTML = '&#8358;' + formatMoney(parseFloat(item.ahhtCommission));
+                document.getElementById('transaction-agreed').innerHTML = '&#8358;' + formatMoney(parseFloat(item.agreedPrice));
+            });
+
+        }
+    }
+    function formatMoney(number, decPlaces, decSep, thouSep) {
+        return number.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+        //decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+        //    decSep = typeof decSep === "undefined" ? "." : decSep;
+        //thouSep = typeof thouSep === "undefined" ? "," : thouSep;
+        //var sign = number < 0 ? "-" : "";
+        //var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
+        //var j = (j = i.length) > 3 ? j % 3 : 0;
+
+        //return sign +
+        //    (j ? i.substr(0, j) + thouSep : "") +
+        //    i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+        //    (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+    }
+</script>
