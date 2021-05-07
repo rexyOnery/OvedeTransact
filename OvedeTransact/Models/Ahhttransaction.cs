@@ -31,5 +31,6 @@ namespace OvedeTransact.Models
         public string TransactionStatus { get; set; }
         public string SellertTransactionCode { get; set; }
         public string Reasons { get; set; }
+        public bool? Processed { get; set; }
     }
 }

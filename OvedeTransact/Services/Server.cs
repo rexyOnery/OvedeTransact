@@ -16,7 +16,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<bool> AddUser<T>(Account account) where T : class
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var user = _context.Accounts
                     .Where(c => c.Username == account.Username);
@@ -40,7 +40,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<bool> Login<T>(Account account) where T : class
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _user = _context.Accounts.FirstOrDefault(c => c.Username.Equals(account.Username));
 
@@ -57,7 +57,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Account>>> Forgot<T>(string username) where T : class
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             { 
                 var _code = await _context.Accounts
                     .Where(c => c.Username == username)
@@ -83,7 +83,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<bool> DeclineTransaction(int transactioncode)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _buyerCon = await _context.Ahhttransactions
                     .FirstOrDefaultAsync(x => x.Id == transactioncode);
@@ -106,7 +106,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Account>>> RecoveryCode<T>(string code) where T : class
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
 
                 return await _context.Accounts
@@ -118,7 +118,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<bool> Reset<T>(Account account) where T : class
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
 
                 var _reset = _context.Accounts
@@ -142,7 +142,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<List<Ahhttransaction>> PostTransaction<T>(Ahhttransaction ahhttransaction) where T : class
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 RandomGenerator generator = new RandomGenerator();
 
@@ -197,7 +197,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> GetRefundInfo(string confirmcode)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var stat = await _context.Ahhttransactions
                     .Where(c => c.ConfirmationCode == confirmcode)
@@ -213,13 +213,14 @@ namespace OvedeTransact.Services
        {
            AgreedPrice = user.AgreedPrice,
            AhhtCommission = user.AhhtCommission,
-           ShippingCost = user.ShippingCost
+           ShippingCost = user.ShippingCost,
+           TotalCost = user.TotalCost
        };
 
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> ConfirmStatus(string confirmcode)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var stat = await _context.Ahhttransactions
                     .Where(c => c.SellertTransactionCode == confirmcode)
@@ -241,7 +242,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> ConfirmDeliveryCode(string transcode)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 
                 var _buyerPaid = _context.Ahhttransactions
@@ -276,7 +277,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<bool> BuyerAcceptPayment(Ahhttransaction ahhttransaction)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var trans = _context.Ahhttransactions.FirstOrDefault(c => c.TransactionCode == ahhttransaction.TransactionCode);
 
@@ -301,7 +302,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<bool> BuyerRequestRefund(Ahhttransaction ahhttransaction)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var trans = _context.Ahhttransactions.FirstOrDefault(c => c.ConfirmationCode == ahhttransaction.TransactionCode);
 
@@ -326,7 +327,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<List<Ahhttransaction>> GetSellerConfirmation(string transaction_code)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _sellerCon = await _context.Ahhttransactions
                     .Where(x => x.TransactionCode == transaction_code)
@@ -350,7 +351,7 @@ namespace OvedeTransact.Services
 
         public static async Task<List<Ahhttransaction>> GetBuyerTransaction(string transaction_code)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _buyerCon = await _context.Ahhttransactions
                     .Where(x => x.TransactionCode == transaction_code)
@@ -374,7 +375,7 @@ namespace OvedeTransact.Services
         public static async Task<bool> SetBuyerPayment(string tranid) 
         {
             bool _confirmed = false;
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _buyerPaid = _context.Ahhttransactions
                     .FirstOrDefault(c => c.TransactionCode == tranid);
@@ -445,7 +446,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<List<Ahhttransaction>> GetDeliveryCode(string transcode)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 return await _context.Ahhttransactions
                     .Where(c => c.TransactionCode == transcode)
@@ -470,7 +471,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> GetSellerTransactions(string phone)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _tranCon = await _context.Ahhttransactions
                     .Where(x => x.SellerMobileNumber == phone)// && x.SellerCodeConfirmed == false)
@@ -496,7 +497,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> GetBuyerTransactions(string phone)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _tranCon = await _context.Ahhttransactions
                     .Where(x => x.BuyerMobileNumber == phone)// && x.SellerCodeConfirmed == false)
@@ -510,7 +511,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> SellerTransactionDetails(int id)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _tranCon = await _context.Ahhttransactions
                     .Where(x => x.Id == id)
@@ -542,7 +543,7 @@ namespace OvedeTransact.Services
 
         internal static async Task<ActionResult<IEnumerable<Ahhttransaction>>> BuyerTransactionDetails(int id)
         {
-            using (var _context = new DB_A5DE44_HoldingContext())
+            using (var _context = new db_a4da38_holdingsContext())
             {
                 var _tranCon = await _context.Ahhttransactions
                     .Where(x => x.Id == id)
@@ -619,6 +620,15 @@ namespace OvedeTransact.Services
                 }
             }
 
+        }
+
+        internal static async Task<List<Ahhttransaction>> GetCurrentDasboad()
+        {
+            using (var _context = new db_a4da38_holdingsContext())
+            {
+                return await _context.Ahhttransactions  
+                    .ToListAsync();
+            }
         }
     }
 }

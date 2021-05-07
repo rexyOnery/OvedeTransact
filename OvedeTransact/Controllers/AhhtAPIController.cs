@@ -170,6 +170,13 @@ namespace OvedeTransact.Controllers
         {
             return await Server.GetRefundInfo(transcode);
         }
-        
+
+        [HttpGet]
+        [Route("getcurrentdashboard")]
+        public async Task<ActionResult<IEnumerable<Ahhttransaction>>> GetCurrentDasboad()
+        {
+            return await Server.GetCurrentDasboad();
+        }
+
     }
 }

@@ -560,7 +560,7 @@
                 var _ship = formatMoney(parseFloat(ship));
                 document.getElementById('ship').innerHTML = _ship;
 
-                var total = parseInt(cost) - parseInt(commission) - parseInt(ship);
+                var total = parseInt(item.totalCost) - parseInt(commission) - parseInt(ship);
                 var _total = formatMoney(parseFloat(total));
                 document.getElementById('total').innerHTML = _total;
 
